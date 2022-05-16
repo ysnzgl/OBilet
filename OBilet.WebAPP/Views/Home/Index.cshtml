@@ -1,0 +1,126 @@
+﻿@model OBilet.WebAPP.Models.LocationViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container">
+    <div class="card text-white bg-primary">
+        <div class="card-header"> <div style="text-align: center"><h3> OBİLET DEMO</h3></div></div>
+    </div><br />
+    <div class="card">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data" asp-controller="Home" asp-action="Journey" class="card-body">
+                <div class="form-row">
+                    <div class="form-group col-md-5">
+                        <label for="origin">Nereden</label>
+                        <select asp-for=OriginId class="selectpicker btn-lg origin" required name="OriginId" id="origin" data-live-search="true" title="Kalkış Yeri" data-live-search-placeholder="Kalkış Yeri">
+                            @foreach (var item in Model.Locations)
+                            {
+                                <option value=@item.Id>@item.Name</option>
+                            }
+
+                        </select>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <button type="button" id="locationChange" class="btn btn-outline-dark btn-sm"><i class="fa fa-arrows-h"></i></button>
+                    </div>
+                    <div class="form-group col-md-5">
+                        <label for="destination">Nereye</label>
+                        <select asp-for=DestinationId class="selectpicker btn-lg destination" required name="DestinationId" id="destination" data-live-search="true" data-live-search-placeholder="Varış Yeri" title="Varış Yeri">
+                            @foreach (var item in Model.Locations)
+                            {
+                                <option value=@item.Id>@item.Name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class=form-row>
+                    <div class="form-group col-md-10">
+                        <div class="datepicker date input-group">
+                            <input asp-for=Date type="text" name="Date" placeholder="Rezervasyon Tarihi" required value="@Model.Date.ToString("dd.MM.yyyy")" class="form-control" id="reservationDate">
+                            <div class="input-group-append"><span class="input-group-text"><i class="fa fa-calendar"></i></span></div>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <div class="btn-group" role="group" aria-label="Basic example">
+                            <button id="today" type="button" class="btn btn-outline-dark">Bugün</button>
+                            <button id="tomorrow" type="button" class="btn btn-outline-dark">Yarın</button>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block" id="TicketFind">Bilet Ara</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var date = new Date();
+    var Index = {
+        init: function () {
+            Index.DateChange();
+            Index.LocationChanges();
+            Index.SelectPickerChange();
+            Index.DatePicker();
+        },
+        DateChange:function() {
+            $('#today').on('click', function () {
+
+                $('.datepicker').datepicker('setDate', date);
+            });
+            $('#tomorrow').on('click', function () {
+                $('.datepicker').datepicker('setDate', new Date(date.getFullYear(), date.getMonth(), (date.getDate() + 1)));
+            });
+        },
+        LocationChanges:function() {
+            $('#locationChange').on('click', function () {
+                var originval = $("#origin").val();
+                var origintext = $("#origin").find("option:selected").text();
+                var destinationval = $("#destination").val();
+                var destinationtext = $("#destination").find("option:selected").text();
+
+                if ($("#origin option[value=" + destinationval + "]").length == 0) {
+                    $('#origin').append('<option value=' + destinationval + '>' + destinationtext + '</option>');
+                    $('#origin').selectpicker('refresh');
+                }
+                $('select[name=OriginId]').val(destinationval);
+                $('#origin').selectpicker('refresh');
+
+
+                if ($("#destination option[value=" + originval + "]").length == 0) {
+                    $('#destination').append('<option value=' + originval + '>' + origintext + '</option>');
+                    $('#destination').selectpicker('refresh');
+                }
+                $('select[name=DestinationId]').val(originval);
+                $('#destination').selectpicker('refresh');
+            });
+        },
+        SelectPickerChange: function() {
+
+            $('.selectpicker').on('change', function () {
+
+                if ($("#origin").val() == $("#destination").val()) {
+                    $.notify("Varış ve Kalkış Yeri Aynı Olamaz.", "error");
+                    $('#TicketFind').attr('disabled', 'disabled');
+                }
+                else {
+                    $('#TicketFind').removeAttr('disabled');
+                }
+
+
+            });
+        },
+        DatePicker:function() {
+
+            $('.datepicker').datepicker({
+                clearBtn: false,
+                format: "dd.mm.yyyy",
+                startDate: new Date()
+            });
+        }
+
+    }; $(document).ready(function () {
+        Index.init();
+    });
+</script>

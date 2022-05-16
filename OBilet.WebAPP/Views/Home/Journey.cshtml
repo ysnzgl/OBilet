@@ -1,0 +1,28 @@
+﻿@model OBilet.WebAPP.Models.JourneyViewModel
+
+@{
+    ViewData["Title"] = "Bus Journeys";
+}
+
+<div>
+
+    <div class="card text-white bg-primary">
+        <div class="card-header"><a href="@Url.Action("Index")" style="color: white"><i class="fa fa-arrow-left fa-2x"></i></a> <div style="text-align: center"><h3> @Model.OriginLocation - @Model.DestinationLocation<br />@Model.Date.ToString("dd MMMM dddd")</h3></div></div>
+
+    </div><br />
+
+
+    @foreach (var item in Model.Journeys.OrderBy(x => x.Departure))
+    {
+        <div class="card border-primary ">
+            <div class="card-body">               
+                    <div class="row">
+                        <div class="col-lg-10">Kalkış<strong> - </strong> Varış</div>
+                        <div class="col-lg-2"><button class="btn btn-danger">@string.Format("{0:C}", @item.Price) @item.Currency</button></div>
+                    </div>
+                <h5 style="color: #007bff">@item.Departure.ToString("HH:mm")<i class="fa fa-long-arrow-right"></i> @item.Arrival.ToString("HH:mm")</h5>
+                <p class="card-text">@item.Origin - @item.Destination</p>
+            </div>
+        </div>
+    }
+</div>
